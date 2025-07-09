@@ -15,8 +15,8 @@ if st.sidebar.button("🔁 Refresh Agents"):
 st.header("🧠 Active Agents")
 
 def is_running(port):
-    for c in psutil.net_connections(kind='inet'):
-        if c.laddr.port == port:
+    for conn in psutil.net_connections(kind='inet'):
+        if conn.laddr.port == port:
             return True
     return False
 
@@ -31,7 +31,7 @@ for agent in agents:
             with open(f"{agent_path}/main.py") as f:
                 st.code(f.read(), language='python')
         except:
-            st.error("❌ Failed to read main.py")
+            st.error("❌ Could not read file")
 
         if not is_running(port):
             try:
@@ -43,6 +43,6 @@ for agent in agents:
         try:
             headers = {"Authorization": f"Bearer {token}"} if token else {}
             r = requests.get(f"http://localhost:{port}", headers=headers, timeout=1)
-            st.success(f"✅ {r.json().get('status','OK')} on port {port}")
+            st.success(f"✅ {r.json().get('status', 'OK')} on port {port}")
         except:
             st.error(f"❌ No response on port {port}")
