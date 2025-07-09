@@ -10,7 +10,7 @@ st.sidebar.title("🔐 API Config")
 token = st.sidebar.text_input("Enter API Token", type="password")
 st.sidebar.markdown("---")
 if st.sidebar.button("🔁 Refresh Agents"):
-    st.experimental_rerun()
+    st.rerun()
 
 st.header("🧠 Active Agents")
 
