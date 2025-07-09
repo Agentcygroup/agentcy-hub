@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import streamlit as st
-import os, requests, subprocess, psutil
+import os, requests, subprocess, socket
 
 st.set_page_config(page_title="Agentcy Hub", layout="wide")
 st.title("🤖 Agentcy Hub Dashboard")
@@ -14,11 +14,12 @@ if st.sidebar.button("🔁 Refresh Agents"):
 
 st.header("🧠 Active Agents")
 
-def is_running(port):
-    for conn in psutil.net_connections(kind='inet'):
-        if conn.laddr.port == port:
-            return True
-    return False
+def is_port_open(port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(0.5)
+    result = s.connect_ex(('localhost', port))
+    s.close()
+    return result == 0
 
 agents = [d for d in os.listdir("..") if os.path.isdir(os.path.join("..", d)) and os.path.isfile(os.path.join("..", d, "main.py"))]
 
@@ -33,7 +34,7 @@ for agent in agents:
         except:
             st.error("❌ Could not read file")
 
-        if not is_running(port):
+        if not is_port_open(port):
             try:
                 subprocess.Popen(["python3", os.path.join(agent_path, "main.py")])
                 st.warning(f"⚙️ Launched on port {port}")
